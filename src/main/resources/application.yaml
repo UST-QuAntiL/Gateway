@@ -17,6 +17,8 @@ org:
       nisq:
         analyzer:
           uri: http://localhost:5010
+      tokens:
+        ibm:
 
 logging:
   level:

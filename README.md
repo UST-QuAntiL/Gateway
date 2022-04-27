@@ -1,6 +1,7 @@
 # QuAntiL Gateway
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Gateway CI](https://github.com/UST-QuAntiL/Gateway/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/UST-QuAntiL/Gateway/actions/workflows/build.yml)
 
 This project provides a facade to be used as a reverse proxy between the QuAntiL user interfaces and the backend services.
 It is built upon the [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway) to intercept and forward requests coming from outside the network. 
