@@ -1,7 +1,9 @@
 package org.planqk.gateway;
 
 import org.junit.jupiter.api.Test;
+import org.planqk.gateway.dtos.CompilerSelectionDto;
 import org.planqk.gateway.dtos.QpuSelectionDto;
+import org.planqk.gateway.dtos.SelectionRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -24,7 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
     }
 )
 @AutoConfigureWireMock(port = 0)
-class GatewayApplicationTests {
+class NisqAnalyzerGatewayTest {
 
     @Autowired
     private WebTestClient webClient;
@@ -57,6 +59,36 @@ class GatewayApplicationTests {
         webClient.post()
             .uri("/nisq-analyzer/qpu-selection")
             .body(Mono.just(new QpuSelectionDto()), QpuSelectionDto.class)
+            .exchange()
+            .expectStatus().isOk();
+    }
+
+    @Test
+    void testCompilerSelectionIsEnrichedWithToken() {
+        stubFor(
+            post(urlEqualTo("/nisq-analyzer/compiler-selection"))
+                .withRequestBody(matchingJsonPath("$.token", containing("myTestToken")))
+                .willReturn(aResponse())
+        );
+
+        webClient.post()
+            .uri("/nisq-analyzer/compiler-selection")
+            .body(Mono.just(new CompilerSelectionDto()), CompilerSelectionDto.class)
+            .exchange()
+            .expectStatus().isOk();
+    }
+
+    @Test
+    void testSelectionIsEnrichedWithToken() {
+        stubFor(
+            post(urlEqualTo("/nisq-analyzer/selection"))
+                .withRequestBody(matchingJsonPath("$.parameters.token", containing("myTestToken")))
+                .willReturn(aResponse())
+        );
+
+        webClient.post()
+            .uri("/nisq-analyzer/selection")
+            .body(Mono.just(new SelectionRequestDto()), SelectionRequestDto.class)
             .exchange()
             .expectStatus().isOk();
     }

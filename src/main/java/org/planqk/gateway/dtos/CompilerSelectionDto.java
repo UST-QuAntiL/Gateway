@@ -4,17 +4,17 @@ import java.net.URL;
 
 public class CompilerSelectionDto {
 
-    String providerName;
+    public String providerName;
 
-    String qpuName;
+    public String qpuName;
 
-    String circuitLanguage;
+    public String circuitLanguage;
 
-    String circuitName;
+    public String circuitName;
 
-    URL circuitUrl;
+    public URL circuitUrl;
 
-    String token;
+    public String token;
 
-    String refreshToken;
+    public String refreshToken;
 }
