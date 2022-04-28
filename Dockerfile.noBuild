@@ -7,7 +7,7 @@ ENV PORT 6473
 ENV LOGGING_LEVEL INFO
 
 ENV NISQ_ANALYZER_URI http://host.docker.internal:5010
-ENV IBM_QUANTUM_TOKEN ''
+ENV IBMQ_TOKEN ''
 
 COPY target/gateway-0.0.1-SNAPSHOT.jar /var/gateway/gateway.jar
 COPY .docker /var/.docker

@@ -26,7 +26,7 @@ Currently, the following gateways are implemented:
 
 This gateway routes requests following the schema ``/nisq-analyzer*`` to the [NISQ-Analyzer](https://github.com/QuAntiL/nisq-analyzer) service that is configured in the `org.planqk.gateway.nisq.analyzer.uri` property, i.e., `NISQ_ANALYZER_URI` in Docker.
 Additionally, there is a special handling of `POST` requests that may contain a Quantum Computing Provider token.
-Hence, the following requests are automatically enriched with a token if its not already set:
+Hence, the following requests are automatically enriched with a token if it is not already set:
 
 - `/nisq-analyzer/compiler-selection`
 - `/nisq-analyzer/qpu-selection`
@@ -35,7 +35,7 @@ Hence, the following requests are automatically enriched with a token if its not
 
 ## Configuration
 
-To configure the gateway to automatically inject an access-token for IBM, add your token to
+To configure the gateway to automatically inject an access-token for IBMQ, add your token to
 the [application.yml](src/main/resources/application.yaml) as follows:
 
 ```yaml
@@ -43,19 +43,19 @@ org:
   planqk:
     gateway:
       tokens:
-        ibm: myIbmQuantumToken
+        ibmq: myIBMQuantumToken
 ```
 
 As an alternative, you can also pass it directly to the application during startup by passing the corresponding property
 as environment variable:
 
 ````shell
-java -jar gateway.jar --org.planqk.gateway.tokens.ibm=myIbmQuantumToken
+java -jar gateway.jar --org.planqk.gateway.tokens.ibmq=myIBMQToken
 ````
 
 This is also possible in IntelliJ.
 Simply configure the GatewayApplication run configuration to pass arguments to the program and enter:
-``--org.planqk.gateway.tokens.ibm=myIbmQuantumToken``
+``--org.planqk.gateway.tokens.ibmq=myIBMQToken``
 
 
 ## Run with Docker
@@ -63,5 +63,5 @@ Simply configure the GatewayApplication run configuration to pass arguments to t
 To start the QuAntiL Gateway as a Docker container, simply run the following command:
 
 ```shell
-docker run -p'6473:6473' -e IBM_QUANTUM_TOKEN=myIbmQuantumToken planqk/gateway
+docker run -p'6473:6473' -e IBMQ_TOKEN=myIBMQToken planqk/gateway
 ```

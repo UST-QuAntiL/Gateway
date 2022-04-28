@@ -21,7 +21,7 @@ org:
         analyzer:
           uri: http://localhost:5010
       tokens:
-        ibm: token
+        ibmq: token
 
 logging:
   level:

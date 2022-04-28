@@ -25,8 +25,8 @@ public class NisqAnalyzerGateway {
     @Value("${org.planqk.gateway.nisq.analyzer.uri}")
     private String nisqAnalyzerUri;
 
-    @Value("${org.planqk.gateway.tokens.ibm}")
-    private String ibmToken;
+    @Value("${org.planqk.gateway.tokens.ibmq}")
+    private String ibmqToken;
 
     @Bean
     public RouteLocator nisqAnalyzerLocator(RouteLocatorBuilder builder) {
@@ -68,7 +68,8 @@ public class NisqAnalyzerGateway {
             selectionRequestDto.parameters = new HashMap<>();
         }
         if (!selectionRequestDto.parameters.containsKey("token")) {
-            selectionRequestDto.parameters.put("token", ibmToken);
+            selectionRequestDto.parameters.put("token", ibmqToken);
+            LOGGER.debug("Added to IBMQ token to SelectionRequest");
         }
 
         return Mono.just(selectionRequestDto);
@@ -76,7 +77,8 @@ public class NisqAnalyzerGateway {
 
     private Publisher<CompilerSelectionDto> addTokenToCompilerSelectionRequest(ServerWebExchange serverWebExchange, CompilerSelectionDto compilerSelectionDto) {
         if (compilerSelectionDto.token == null || compilerSelectionDto.token.isBlank()) {
-            compilerSelectionDto.token = ibmToken;
+            compilerSelectionDto.token = ibmqToken;
+            LOGGER.debug("Added to IBMQ token to CompilerSelectionRequest");
         }
 
         return Mono.just(compilerSelectionDto);
@@ -85,7 +87,8 @@ public class NisqAnalyzerGateway {
     private Publisher<QpuSelectionDto> addTokenToQpuSelectionRequest(ServerWebExchange serverWebExchange, QpuSelectionDto selectionDto) {
         if (selectionDto.tokens == null || selectionDto.tokens.isEmpty()) {
             selectionDto.tokens = new HashMap<>();
-            selectionDto.tokens.put("ibm", ibmToken);
+            selectionDto.tokens.put("ibmq", ibmqToken);
+            LOGGER.debug("Added to IBMQ token to QpuSelectionRequest");
         }
         return Mono.just(selectionDto);
     }

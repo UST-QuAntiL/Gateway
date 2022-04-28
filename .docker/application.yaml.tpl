@@ -8,7 +8,7 @@ org:
         analyzer:
           uri: {{ .Env.NISQ_ANALYZER_URI }}
       tokens:
-        ibm: {{ .Env.IBM_QUANTUM_TOKEN }}
+        ibmq: {{ .Env.IBMQ_TOKEN }}
 
 logging:
   level:

@@ -22,7 +22,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
         "org.planqk.gateway.nisq.analyzer.uri=http://localhost:${wiremock.server.port}",
-        "org.planqk.gateway.tokens.ibm=myTestToken"
+        "org.planqk.gateway.tokens.ibmq=myTestToken"
     }
 )
 @AutoConfigureWireMock(port = 0)
@@ -52,7 +52,7 @@ class NisqAnalyzerGatewayTest {
     void testQpuSelectionIsEnrichedWithToken() {
         stubFor(
             post(urlEqualTo("/nisq-analyzer/qpu-selection"))
-                .withRequestBody(matchingJsonPath("$.tokens.ibm", containing("myTestToken")))
+                .withRequestBody(matchingJsonPath("$.tokens.ibmq", containing("myTestToken")))
                 .willReturn(aResponse())
         );
 
