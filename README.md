@@ -10,7 +10,7 @@ requests coming from outside the network.
 
 ## Build
 
-1. Run `mvn package -DskipTests` inside the root folder.
+1. Run `mvn package -DskipTests` inside the root folder using [OpenJdk 17](https://openjdk.java.net/projects/jdk/17/) or above.
 2. When completed, the product can be found in the `target` folder.
 
 ## Usage
