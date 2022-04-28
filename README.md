@@ -13,6 +13,26 @@ requests coming from outside the network.
 1. Run `mvn package -DskipTests` inside the root folder.
 2. When completed, the product can be found in the `target` folder.
 
+## Usage
+
+The Gateway listens per default on port `6473`.
+Hence, if you send a request to <http://localhost:6473> you can reach it. However, it will return a 404 response, as the root resource is currently not mapped.
+
+### Gateways
+
+Currently, the following gateways are implemented:
+
+#### NISQ-Analyzer Gateway
+
+This gateway routes requests following the schema ``/nisq-analyzer*`` to the [NISQ-Analyzer](https://github.com/QuAntiL/nisq-analyzer) service that is configured in the `org.planqk.gateway.nisq.analyzer.uri` property, i.e., `NISQ_ANALYZER_URI` in Docker.
+Additionally, there is a special handling of `POST` requests that may contain a Quantum Computing Provider token.
+Hence, the following requests are automatically enriched with a token if its not already set:
+
+- `/nisq-analyzer/compiler-selection`
+- `/nisq-analyzer/qpu-selection`
+- `/nisq-analyzer/selection`
+
+
 ## Configuration
 
 To configure the gateway to automatically inject an access-token for IBM, add your token to
@@ -33,6 +53,15 @@ as environment variable:
 java -jar gateway.jar --org.planqk.gateway.tokens.ibm=myIbmQuantumToken
 ````
 
-This is also possible to configure in IntelliJ.
+This is also possible in IntelliJ.
 Simply configure the GatewayApplication run configuration to pass arguments to the program and enter:
 ``--org.planqk.gateway.tokens.ibm=myIbmQuantumToken``
+
+
+## Run with Docker
+
+To start the QuAntiL Gateway as a Docker container, simply run the following command:
+
+```shell
+docker run -p'6473:6473' -e IBM_QUANTUM_TOKEN=myIbmQuantumToken planqk/gateway
+```

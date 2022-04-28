@@ -1,3 +1,6 @@
+server:
+  port: 6473
+
 spring:
   cloud:
     gateway:
@@ -18,7 +21,7 @@ org:
         analyzer:
           uri: http://localhost:5010
       tokens:
-        ibm:
+        ibm: token
 
 logging:
   level:
