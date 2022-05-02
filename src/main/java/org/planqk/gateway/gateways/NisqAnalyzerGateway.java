@@ -1,6 +1,7 @@
 package org.planqk.gateway.gateways;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.planqk.gateway.dtos.CompilerSelectionDto;
 import org.planqk.gateway.dtos.QpuSelectionDto;
@@ -48,7 +49,7 @@ public class NisqAnalyzerGateway {
                     filter.modifyRequestBody(CompilerSelectionDto.class, CompilerSelectionDto.class, this::addTokenToCompilerSelectionRequest)
                 )
                 .uri(nisqAnalyzerUri))
-            .route("compiler-selection", route -> route
+            .route("selection", route -> route
                 .path(CONTEXT_PATH + "/selection")
                 .and()
                 .method(HttpMethod.POST)
@@ -57,7 +58,7 @@ public class NisqAnalyzerGateway {
                 )
                 .uri(nisqAnalyzerUri))
             .route("default-route", route -> route
-                .path(CONTEXT_PATH + "*")
+                .path(CONTEXT_PATH + "/*", CONTEXT_PATH + "/*/*", CONTEXT_PATH + "/*/*/*", CONTEXT_PATH + "/*/*/*/*")
                 .uri(nisqAnalyzerUri)
             )
             .build();
@@ -67,7 +68,7 @@ public class NisqAnalyzerGateway {
         if (selectionRequestDto.parameters == null) {
             selectionRequestDto.parameters = new HashMap<>();
         }
-        if (!selectionRequestDto.parameters.containsKey("token")) {
+        if (!selectionRequestDto.parameters.containsKey("token") || selectionRequestDto.parameters.get("token") == null || selectionRequestDto.parameters.get("token").isBlank()) {
             selectionRequestDto.parameters.put("token", ibmqToken);
             LOGGER.debug("Added to IBMQ token to SelectionRequest");
         }
@@ -85,7 +86,7 @@ public class NisqAnalyzerGateway {
     }
 
     private Publisher<QpuSelectionDto> addTokenToQpuSelectionRequest(ServerWebExchange serverWebExchange, QpuSelectionDto selectionDto) {
-        if (selectionDto.tokens == null || selectionDto.tokens.isEmpty()) {
+        if (selectionDto.tokens == null || selectionDto.tokens.isEmpty() || selectionDto.tokens.get("IBMQ") == null || selectionDto.tokens.get("IBMQ").isBlank()) {
             selectionDto.tokens = new HashMap<>();
             selectionDto.tokens.put("ibmq", ibmqToken);
             LOGGER.debug("Added to IBMQ token to QpuSelectionRequest");
