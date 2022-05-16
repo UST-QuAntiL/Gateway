@@ -58,7 +58,7 @@ public class NisqAnalyzerGateway {
                 )
                 .uri(nisqAnalyzerUri))
             .route("default-route", route -> route
-                .path(CONTEXT_PATH + "*", CONTEXT_PATH + "/*", CONTEXT_PATH + "/*/*", CONTEXT_PATH + "/*/*/*", CONTEXT_PATH + "/*/*/*/*")
+                .path(CONTEXT_PATH + "*", CONTEXT_PATH + "/**")
                 .uri(nisqAnalyzerUri)
             )
             .build();
