@@ -19,4 +19,6 @@ public class QpuSelectionDto {
     public String refreshToken;
 
     public String circuitName;
+
+    public String userId;
 }
