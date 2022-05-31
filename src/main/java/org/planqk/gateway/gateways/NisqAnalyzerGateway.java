@@ -1,7 +1,10 @@
 package org.planqk.gateway.gateways;
 
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.addOriginalRequestUrl;
+
+import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.planqk.gateway.dtos.CompilerSelectionDto;
 import org.planqk.gateway.dtos.QpuSelectionDto;
@@ -14,6 +17,7 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -25,6 +29,9 @@ public class NisqAnalyzerGateway {
 
     @Value("${org.planqk.gateway.nisq.analyzer.uri}")
     private String nisqAnalyzerUri;
+
+    @Value("${server.port}")
+    private String gatewayUri;
 
     @Value("${org.planqk.gateway.tokens.ibmq}")
     private String ibmqToken;
@@ -41,6 +48,20 @@ public class NisqAnalyzerGateway {
                 )
                 .uri(nisqAnalyzerUri)
             )
+            .route("qpu-selection-result-execute", route -> route
+                .path(CONTEXT_PATH + "/qpu-selection-results/*/execute")
+                .and()
+                .method(HttpMethod.POST)
+                .filters(f -> f.filter(((exchange, chain) -> {
+                        f.rewritePath("/qpu-selection-results/(?<segment>.*)/execute", "/qpu-selection-results/${segment}/execute");
+                        ServerHttpRequest req = exchange.getRequest();
+                        addOriginalRequestUrl(exchange, req.getURI());
+                        ServerHttpRequest request = req.mutate().uri(addTokenToExecutionRequest(exchange)).build();
+                        exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, request.getURI());
+                        return chain.filter(exchange.mutate().request(request).build());
+                    }))
+                )
+                .uri(nisqAnalyzerUri))
             .route("compiler-selection", route -> route
                 .path(CONTEXT_PATH + "/compiler-selection")
                 .and()
@@ -92,5 +113,17 @@ public class NisqAnalyzerGateway {
             LOGGER.debug("Added to IBMQ token to QpuSelectionRequest");
         }
         return Mono.just(selectionDto);
+    }
+
+    private URI addTokenToExecutionRequest(ServerWebExchange serverWebExchange) {
+        URI newUri = serverWebExchange.getRequest().getURI();
+        String tokenString = serverWebExchange.getRequest().getURI().getQuery();
+        tokenString = tokenString.replace("token=", "");
+        if (tokenString.isBlank() || tokenString.equals("")) {
+            tokenString = "token=" + ibmqToken;
+            LOGGER.debug("Added to IBMQ token to ExecutionRequest");
+            newUri = URI.create("http://localhost:" + gatewayUri + serverWebExchange.getRequest().getPath() + "?" + tokenString);
+        }
+        return newUri;
     }
 }
