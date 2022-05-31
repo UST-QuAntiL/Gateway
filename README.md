@@ -29,8 +29,11 @@ Additionally, there is a special handling of `POST` requests that may contain a 
 Hence, the following requests are automatically enriched with a token if it is not already set:
 
 - `/nisq-analyzer/compiler-selection`
+- `/nisq-analyzer/compiler-results/{resId}/execute`
 - `/nisq-analyzer/qpu-selection`
+- `/nisq-analyzer/qpu-selection-results/{resId}/execute`
 - `/nisq-analyzer/selection`
+- `/nisq-analyzer/analysis-results/{resId}/execute`
 
 
 ## Configuration

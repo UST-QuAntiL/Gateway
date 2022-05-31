@@ -6,6 +6,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.a
 import java.net.URI;
 import java.util.HashMap;
 
+import org.planqk.gateway.dtos.AnalysisResultExecutionDto;
 import org.planqk.gateway.dtos.CompilerSelectionDto;
 import org.planqk.gateway.dtos.QpuSelectionDto;
 import org.planqk.gateway.dtos.SelectionRequestDto;
@@ -70,12 +71,34 @@ public class NisqAnalyzerGateway {
                     filter.modifyRequestBody(CompilerSelectionDto.class, CompilerSelectionDto.class, this::addTokenToCompilerSelectionRequest)
                 )
                 .uri(nisqAnalyzerUri))
+            .route("compiler-result-execute", route -> route
+                .path(CONTEXT_PATH + "/compiler-results/*/execute")
+                .and()
+                .method(HttpMethod.POST)
+                .filters(f -> f.filter(((exchange, chain) -> {
+                        f.rewritePath("/compiler-results/(?<segment>.*)/execute", "/compiler-results/${segment}/execute");
+                        ServerHttpRequest req = exchange.getRequest();
+                        addOriginalRequestUrl(exchange, req.getURI());
+                        ServerHttpRequest request = req.mutate().uri(addTokenToExecutionRequest(exchange)).build();
+                        exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, request.getURI());
+                        return chain.filter(exchange.mutate().request(request).build());
+                    }))
+                )
+                .uri(nisqAnalyzerUri))
             .route("selection", route -> route
                 .path(CONTEXT_PATH + "/selection")
                 .and()
                 .method(HttpMethod.POST)
                 .filters(filter ->
                     filter.modifyRequestBody(SelectionRequestDto.class, SelectionRequestDto.class, this::addTokenToSelectionRequest)
+                )
+                .uri(nisqAnalyzerUri))
+            .route("analysis-result-execute", route -> route
+                .path(CONTEXT_PATH + "/analysis-results/*/execute")
+                .and()
+                .method(HttpMethod.POST)
+                .filters(filter -> filter.rewritePath("/analysis-results/(?<segment>.*)/execute", "/analysis-results/${segment}/execute")
+                    .modifyRequestBody(AnalysisResultExecutionDto.class, AnalysisResultExecutionDto.class, this::addTokenToAnalysisResultExecutionRequest)
                 )
                 .uri(nisqAnalyzerUri))
             .route("default-route", route -> route
@@ -95,6 +118,15 @@ public class NisqAnalyzerGateway {
         }
 
         return Mono.just(selectionRequestDto);
+    }
+
+    private Publisher<AnalysisResultExecutionDto> addTokenToAnalysisResultExecutionRequest(ServerWebExchange serverWebExchange, AnalysisResultExecutionDto analysisResultExecutionDto) {
+        if (analysisResultExecutionDto.token == null || analysisResultExecutionDto.token.isBlank()) {
+            analysisResultExecutionDto.token = ibmqToken;
+            LOGGER.debug("Added to IBMQ token to AnalysisResultExecutionRequest");
+        }
+
+        return Mono.just(analysisResultExecutionDto);
     }
 
     private Publisher<CompilerSelectionDto> addTokenToCompilerSelectionRequest(ServerWebExchange serverWebExchange, CompilerSelectionDto compilerSelectionDto) {
@@ -121,7 +153,7 @@ public class NisqAnalyzerGateway {
         tokenString = tokenString.replace("token=", "");
         if (tokenString.isBlank() || tokenString.equals("")) {
             tokenString = "token=" + ibmqToken;
-            LOGGER.debug("Added to IBMQ token to ExecutionRequest");
+            LOGGER.debug("Added IBMQ token to ExecutionRequest");
             newUri = URI.create("http://localhost:" + gatewayUri + serverWebExchange.getRequest().getPath() + "?" + tokenString);
         }
         return newUri;
